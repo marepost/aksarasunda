@@ -8,10 +8,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Konfigurasi folder tempat menyimpan unggahan gambar sementara
-if os.environ.get('VERCEL'):
-    UPLOAD_FOLDER = '/tmp'
-else:
-    UPLOAD_FOLDER = os.path.join('static', 'uploads')
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 

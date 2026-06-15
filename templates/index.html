@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klasifikasi Aksara Sunda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #EEEBDA; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #282b4a; 
+        }
+        .card { 
+            border: none; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(40,43,74,0.08); 
+            background-color: #ffffff; 
+        }
+        .navbar { 
+            background-color: #282b4a !important; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .upload-box { 
+            border: 2px dashed #282b4a; 
+            padding: 30px; 
+            border-radius: 8px; 
+            background-color: #f7f6f2; 
+            text-align: center; 
+        }
+        .result-box { 
+            display: none; 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+        }
+        .accent-text { 
+            color: #282b4a; 
+            font-weight: bold; 
+        }
+        .preview-input { 
+            max-height: 150px; 
+            object-fit: contain; 
+            display: none; 
+            margin: 10px auto; 
+        }
+        .btn-custom-navy {
+            background-color: #282b4a;
+            color: #EEEBDA;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-custom-navy:hover:not([disabled]) {
+            background-color: #1d1f36;
+            color: #ffffff;
+        }
+        .btn-outline-navy {
+            border: 1px solid #282b4a;
+            color: #282b4a;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-navy:hover {
+            background-color: #282b4a;
+            color: #EEEBDA;
+        }
+        .btn { 
+            border-radius: 6px; 
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 fw-bold">Aksara Sunda Classifier</span>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card p-4">
+                    <h5 class="card-title mb-3 fw-bold text-dark">Unggah Aksara</h5>
+                    <p class="text-muted small">Tulis sebuah karakter Aksara Sunda pada kertas putih, foto dengan jelas (scan), lalu unggah di sini.</p>
+                    
+                    <form id="uploadForm">
+                        <input type="file" id="galleryInput" name="file" accept="image/*" style="display: none;">
+                        <input type="file" id="cameraInput" name="file" accept="image/*" capture="environment" style="display: none;">
+
+                        <div class="upload-box mb-3">
+                            <div id="uploadPrompt">
+                                <p class="mb-3 fw-semibold text-secondary small text-uppercase">Pilih Metode Pengunggahan</p>
+                                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                    <button type="button" class="btn btn-outline-navy btn-sm px-3 fw-medium" onclick="document.getElementById('galleryInput').click()">Pilih dari Galeri</button>
+                                    <button type="button" class="btn btn-outline-navy btn-sm px-3 fw-medium" onclick="document.getElementById('cameraInput').click()">Kamera</button>
+                                </div>
+                            </div>
+                            
+                            <img id="inputPreview" class="img-fluid rounded border preview-input" alt="Preview Input">
+                            <div id="fileSelectedName" class="mt-2 text-secondary fw-bold small" style="display: none;"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-custom-navy w-100 py-2 fw-semibold" id="btnSubmit" disabled>Proses</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card p-4 h-100">
+                    <div class="d-flex flex-column justify-content-center align-items-center text-center h-100" id="placeholderBox">
+                        <div class="text-muted">
+                            <p class="fs-5 fw-bold text-secondary mb-1">Hasil Analisis</p>
+                            <p class="small mb-0">Belum ada data. Silakan unggah gambar di kolom kiri.</p>
+                        </div>
+                    </div>
+
+                    <div class="result-box h-100 flex-column justify-content-between" id="resultBox">
+                        <div>
+                            <h5 class="fw-bold mb-4 text-start text-dark">Hasil Analisis</h5>
+                            <div class="row align-items-center">
+                                <div class="col-sm-5 text-center mb-3 mb-sm-0">
+                                    <p class="small text-muted mb-2">Aksara yang Diproses</p>
+                                    <img src="" id="resImage" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;" alt="Input">
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="p-3 bg-light rounded border border-secondary-subtle">
+                                        <p class="text-muted small mb-1 text-uppercase tracking-wider">Terdeteksi Sebagai Aksara:</p>
+                                        <h1 class="display-4 fw-bold accent-text mb-2" id="resClass">KA</h1>
+                                        <p class="mb-0 small fw-medium text-secondary">Tingkat Keyakinan: <span class="accent-text" id="resConfidence">0.00%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-navy btn-sm mt-4 align-self-start" onclick="resetPage()">Reset Halaman</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const galleryInput = document.getElementById('galleryInput');
+        const cameraInput = document.getElementById('cameraInput');
+        const fileSelectedName = document.getElementById('fileSelectedName');
+        const inputPreview = document.getElementById('inputPreview');
+        const uploadForm = document.getElementById('uploadForm');
+        const btnSubmit = document.getElementById('btnSubmit');
+
+        const placeholderBox = document.getElementById('placeholderBox');
+        const resultBox = document.getElementById('resultBox');
+        
+        let activeFile = null;
+
+        function handleFileSelect(inputElement) {
+            if (inputElement.files && inputElement.files[0]) {
+                activeFile = inputElement.files[0];
+                fileSelectedName.textContent = "Berkas terpilih: " + activeFile.name;
+                fileSelectedName.style.display = "block";
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    inputPreview.src = e.target.result;
+                    inputPreview.style.display = "block";
+                }
+                reader.readAsDataURL(activeFile);
+                
+                btnSubmit.disabled = false;
+            }
+        }
+
+        galleryInput.addEventListener('change', function() { handleFileSelect(this); cameraInput.value = ''; });
+        cameraInput.addEventListener('change', function() { handleFileSelect(this); galleryInput.value = ''; });
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!activeFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', activeFile);
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = 'Memproses Analisis...';
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error, status = ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = 'Proses Klasifikasi';
+
+                if (data.success) {
+                    document.getElementById('resImage').src = '/' + data.image_url + '?t=' + new Date().getTime();
+                    document.getElementById('resClass').textContent = data.class_name;
+                    document.getElementById('resConfidence').textContent = data.confidence;
+
+                    // Mengatur transisi penukaran tampilan box di dalam kartu kustom
+                    placeholderBox.classList.add('d-none');
+                    placeholderBox.classList.remove('d-flex');
+                    resultBox.style.display = 'flex';
+                } else {
+                    alert('Error Model: ' + data.error);
+                }
+            })
+            .catch(error => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = 'Proses Klasifikasi';
+                alert('Terjadi kesalahan pada jaringan atau server!.');
+                console.error(error);
+            });
+        });
+
+        function resetPage() {
+            uploadForm.reset();
+            activeFile = null;
+            fileSelectedName.style.display = "none";
+            inputPreview.style.display = "none";
+            btnSubmit.disabled = true;
+            
+            placeholderBox.classList.remove('d-none');
+            placeholderBox.classList.add('d-flex');
+            resultBox.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

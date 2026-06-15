@@ -1,0 +1,26 @@
+# === Python & Cache ===
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+.env
+.venv
+
+# === Gambar Sementara / Hasil Testing ===
+static/uploads/*
+!static/uploads/.gitkeep
+tmp/
+
+# === IDE & OS Trash ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Dataset Pelatihan (Jangan di-upload) ===
+dataset_gabung_fix/
+data/
